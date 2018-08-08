@@ -1,23 +1,25 @@
-import setuptools
+from setuptools import setup, find_packages
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-setuptools.setup(
+setup(
     name="xl-sudoku-solver",
     version="0.0.1",
+    packages=find_packages(),
+    entry_points={
+        "console_scripts": [
+            "xl-soduku-solver = xl_sudoku_solver.__main__:main"
+        ]
+    },
+    include_package_data=True,
+    test_suite="tests",
+
     author="Xulun Li",
     author_email="lixulun99@hotmail.com",
     description="A beautiful Sudoku solver",
+    license="MIT",
+    url="https://github.com/lixulun/XL-Sudoku-Solver",
     long_description=long_description,
-    long_description_content_type="text/markdown",
-    packages=setuptools.find_packages(),
-    classifiers=(
-        "Environment :: Console",
-        "Intended Audience :: Developers",
-        "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
-        "Topic :: Utilities"
-    ),
+    long_description_content_type="text/markdown"
 )
