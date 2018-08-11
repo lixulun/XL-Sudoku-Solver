@@ -5,11 +5,11 @@ with open("README.md", "r") as fh:
 
 setup(
     name="xl-sudoku-solver",
-    version="0.0.1",
+    version="0.0.1r1",
     packages=find_packages(),
     entry_points={
         "console_scripts": [
-            "xl-soduku-solver = xl_sudoku_solver.__main__:main"
+            "xl-sudoku-solver = xl_sudoku_solver.__main__:main"
         ]
     },
     include_package_data=True,

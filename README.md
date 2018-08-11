@@ -1,5 +1,10 @@
 # XL-Sudoku-Solver
 
+## Install
+```
+pip install xl-sudoku-solver
+```
+
 ## Usage
 Cmd:
 ```
@@ -15,7 +20,7 @@ xx7xx3xxx
 3xxxx28x9
 ```
 ```
-$ python -m xl_sudoku_solver --time -f problem1.txt
+$ xl-sudoku-solver --time -f problem1.txt
 +-----------+-----------+-----------+
 | 9 ! 5 ! 3 | 7 ! 2 ! 4 | 6 ! 8 ! 1 |
 | 7 ! 8 ! 1 | 6 ! 3 ! 9 | 5 ! 4 ! 2 |
