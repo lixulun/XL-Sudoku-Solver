@@ -14,7 +14,8 @@ def main():
             problem = f.read()
     else:
         print('Please type the problem in:')
-        problem = sys.stdin.read()
+        # insert a white line means input is over
+        problem = ''.join(line for line in iter(sys.stdin.readline, '\n'))
 
     process = Solver.solve(Solver.load(problem))
     process.draw()

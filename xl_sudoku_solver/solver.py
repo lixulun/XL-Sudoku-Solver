@@ -1,9 +1,8 @@
 from .exceptions import FormatError, ComputeError
 from .cell import Cell
 from collections import deque
-from itertools import combinations
 
-import heapq, copy, time
+import heapq, copy, time, itertools
 
 
 class _Process():
@@ -68,22 +67,22 @@ class Solver():
     def validate(table):
         """Check whether or not a table is perfectly complete.
         """
-        # test horizontal
+        # test each column
         for i in range(9):
             test_cell = Cell()
             test_cell.minus(*table[i])
             if len(test_cell) > 0:
                 return False
-        # test vertical
+        # test each row
         for j in range(9):
             test_cell = Cell()
             test_cell.minus(*(table[i][j] for i in range(9)))
             if len(test_cell) > 0:
                 return False
-        # test windows
-        for ki,kj in ((x,y) for x in range(0,9,3) for y in range(0,9,3)):
+        # test each box
+        for ki,kj in (itertools.product([0,3,6], repeat=2)):
             test_cell = Cell()
-            for i, j in ((ki+x, kj+y) for x in range(3) for y in range(3)):
+            for i, j in ((x, y) for x in range(ki, ki+3) for y in range(kj, kj+3)):
                 test_cell.minus(table[i][j])
             if len(test_cell) > 0:
                 return False
@@ -145,34 +144,23 @@ class Solver():
     def is_confirm(self):
         return Solver.validate(self.table)
 
-    def horizontal_indices(self, x, y):
-        return [(x,i) for i in range(9) if not i == y]
+    def walk_row(self, x, y):
+        return ((x,i) for i in range(9) if not i == y)
 
-    def vertical_indices(self, x, y):
-        return [(i,y) for i in range(9) if not i == x]
+    def walk_column(self, x, y):
+        return ((i,y) for i in range(9) if not i == x)
 
-    def cells_indices(self, x, y):
-        base = (x-x%3, y-y%3)
-        result = []
-        for i in range(3):
-            for j in range(3):
-                a, b = base[0]+i, base[1]+j
-                if a == x and b == y:
-                    continue
-                result.append((a, b))
-        return result
+    def walk_box(self, x, y):
+        kx, ky = (x-x%3, y-y%3)
+        return ((i, j) for i in range(kx, kx+3) for j in range(ky, ky+3) if i != x and j != y)
 
-    def all_indices(self, x, y):
-        idx = set(self.horizontal_indices(x, y) + self.vertical_indices(x, y) + self.cells_indices(x, y))
-        for i in idx:
-            try:
-                self.table[i[0]][i[1]]
-            except IndexError:
-                continue
+    def related_cells(self, x, y):
+        for i in itertools.chain(self.walk_row(x, y),
+            self.walk_column(x, y), self.walk_box(x, y)):
             yield i
 
     def all_affected_cells(self, x, y):
-        for p in self.all_indices(x, y):
+        for p in self.related_cells(x, y):
             i, j = p
             if isinstance(self.table[i][j], Cell):
                 yield self.table[i][j]
@@ -185,7 +173,7 @@ class Solver():
             self.table[x][y].set_pos(x, y)
         cell = self.table[x][y]
         
-        for idx in self.all_indices(x, y):
+        for idx in self.related_cells(x, y):
             i, j = idx
             if isinstance(self.table[i][j], int):
                 cell.minus(self.table[i][j])

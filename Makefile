@@ -5,7 +5,7 @@ test:
 
 build:
 	$(SETUP) build
-	$(SETUP) sdist bdist_wheel
+	$(SETUP) sdist bdist_wheel bdist_egg
 
 develop:
 	$(SETUP) develop

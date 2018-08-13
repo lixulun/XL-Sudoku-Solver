@@ -8,8 +8,8 @@ ALL_POSSIBLE_VALUES = [True,True,True,True,True,True,True,True,True]
 class TestCell(unittest.TestCase):
 
     def test_init(self):
-        self.assertEquals(len(Cell()._values), 9)
-        self.assertEquals(Cell()._values, ALL_POSSIBLE_VALUES)
+        self.assertEqual(len(Cell()._values), 9)
+        self.assertEqual(Cell()._values, ALL_POSSIBLE_VALUES)
 
     def test_minus(self):
         self.assertEqual(Cell(ALL_POSSIBLE_VALUES).minus(1), Cell([False,True,True,True,True,True,True,True,True]))
