@@ -96,7 +96,7 @@ class Solver():
         exploration = [] # A stack, used to store uncertained tables, wrapped by Process
 
         def add2exploration(svl):
-            x, y = p = min(svl.uncertain, key=lambda p: svl.table[p[0]][p[1]])
+            x, y = min(svl.uncertain, key=lambda p: svl.table[p[0]][p[1]])
             for k in svl.table[x][y].all_possibility():
                 process = _Process.from_solver(svl)
                 process.table[x][y] = k
@@ -112,7 +112,6 @@ class Solver():
             explore = exploration.pop()
             try:
                 svl = cls(explore.table)
-                uncertained = len(svl.uncertain)
                 if not svl.is_end():
                     add2exploration(svl)
                 elif not svl.is_confirm():
