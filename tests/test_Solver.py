@@ -1,91 +1,11 @@
-from xl_sudoku_solver.solver import Solver
-from xl_sudoku_solver.exceptions import *
+import os
+import unittest
 
-import unittest, os
+from xl_sudoku_solver.exceptions import *
+from xl_sudoku_solver import Solver, load_from_file
+
 
 class TestSolver(unittest.TestCase):
-
-    def test_load(self):
-        with self.assertRaises(FormatError):
-            Solver.load(None)
-        with self.assertRaises(FormatError):
-            Solver.load('')
-        with self.assertRaises(FormatError):
-            Solver.load('123456789')
-        with self.assertRaises(FormatError):
-            Solver.load('123456789\n123456789')
-        with self.assertRaises(FormatError):
-            Solver.load('123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789')
-        with self.assertRaises(FormatError):
-            Solver.load('123d26789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789')
-        with self.assertRaises(FormatError):
-            Solver.load('i1xxxx64x\n5xx1x328x\nxxx75xy1x\n8x4325xxx\n96xxxx7xx\nxxx97685x\n698x37421\n421x895xx\n3x7241x6x')
-        with self.assertRaises(FormatError):
-            Solver.load("""
-            123456789
-            12x456789
-            123456789
-            12345678
-            123456789
-            123456789
-            123456789
-            123456789
-            12345678x""")
-        with self.assertRaises(FormatError):
-            Solver.load("""
-            123456789
-            12x456789
-            123456789
-            12345678xx
-            123456789
-            123456789
-            123456789
-            123456789
-            12345678x""")
-
-        self.assertEqual(Solver.load('123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789\n123456789'),
-            [[1,2,3,4,5,6,7,8,9],[1,2,3,4,5,6,7,8,9],[1,2,3,4,5,6,7,8,9],
-            [1,2,3,4,5,6,7,8,9],[1,2,3,4,5,6,7,8,9],[1,2,3,4,5,6,7,8,9],
-            [1,2,3,4,5,6,7,8,9],[1,2,3,4,5,6,7,8,9],[1,2,3,4,5,6,7,8,9]])
-        self.assertEqual(Solver.load("""
-                             12345        6789
-                            12345          6789
-                           12345            6789
-                          12345              6789
-                        12345                 6789
-                         12345                 6789
-                          12345                 6789
-                            12345                6789
-                              12345               6789"""),
-            [[1,2,3,4,5,6,7,8,9],[1,2,3,4,5,6,7,8,9],[1,2,3,4,5,6,7,8,9],
-            [1,2,3,4,5,6,7,8,9],[1,2,3,4,5,6,7,8,9],[1,2,3,4,5,6,7,8,9],
-            [1,2,3,4,5,6,7,8,9],[1,2,3,4,5,6,7,8,9],[1,2,3,4,5,6,7,8,9]])
-        self.assertEqual(Solver.load("""
-            123456789
-            12x456789
-            123456789
-            123456789
-            123456789
-            123456789
-            123456789
-            123456789
-            12345678x"""),
-            [[1,2,3,4,5,6,7,8,9],[1,2,None,4,5,6,7,8,9],[1,2,3,4,5,6,7,8,9],
-            [1,2,3,4,5,6,7,8,9],[1,2,3,4,5,6,7,8,9],[1,2,3,4,5,6,7,8,9],
-            [1,2,3,4,5,6,7,8,9],[1,2,3,4,5,6,7,8,9],[1,2,3,4,5,6,7,8,None]])
-        self.assertNotEqual(Solver.load("""
-            123456789
-            12x456789
-            123456789
-            123456789
-            123456789
-            123x56789
-            123456789
-            123456789
-            12345678x"""),
-            [[1,2,3,4,5,6,7,8,9],[1,2,None,4,5,6,7,8,9],[1,2,3,4,5,6,7,8,9],
-            [1,2,3,4,5,6,7,8,9],[1,2,3,4,5,6,7,8,9],[1,2,3,4,5,6,7,8,9],
-            [1,2,3,4,5,6,7,8,9],[1,2,3,4,5,6,7,8,9],[1,2,3,4,5,6,7,8,None]])
 
     def test_validate(self):
         self.assertTrue(Solver.validate([
@@ -134,25 +54,16 @@ class TestSolver(unittest.TestCase):
         ]))
 
     def test_solve(self):
-        def open_file(filename):
-            print(filename)
-            f = open(os.path.join(os.path.dirname(__file__), filename), 'r')
-            return f
-        with open_file('problem-simple-1.txt') as problem1:
-            Solver.solve(Solver.load(problem1.read())).draw()
-        with open_file('problem-simple-2.txt') as problem2:
-            Solver.solve(Solver.load(problem2.read())).draw()
-        with open_file('problem-primary-1.txt') as problem3:
-            Solver.solve(Solver.load(problem3.read())).draw()
-        with open_file('problem-primary-2.txt') as problem4:
-            Solver.solve(Solver.load(problem4.read())).draw()
-        with open_file('problem-medium-1.txt') as problem5:
-            Solver.solve(Solver.load(problem5.read())).draw()
-        with open_file('problem-medium-2.txt') as problem6:
-            Solver.solve(Solver.load(problem6.read())).draw()
-        with open_file('problem-senior-1.txt') as problem7:
-            Solver.solve(Solver.load(problem7.read())).draw()
-        with open_file('problem-senior-2.txt') as problem8:
-            Solver.solve(Solver.load(problem8.read())).draw()
-        with open_file('problem-memory.txt') as problem9:
-            Solver.solve(Solver.load(problem9.read())).draw()
+
+        def path(testfile):
+            return os.path.join(os.path.dirname(__file__), testfile)
+
+        Solver.solve(load_from_file(path('problem-simple-1.txt'))).draw()
+        Solver.solve(load_from_file(path('problem-simple-2.txt'))).draw()
+        Solver.solve(load_from_file(path('problem-primary-1.txt'))).draw()
+        Solver.solve(load_from_file(path('problem-primary-2.txt'))).draw()
+        Solver.solve(load_from_file(path('problem-medium-1.txt'))).draw()
+        Solver.solve(load_from_file(path('problem-medium-2.txt'))).draw()
+        Solver.solve(load_from_file(path('problem-senior-1.txt'))).draw()
+        Solver.solve(load_from_file(path('problem-senior-2.txt'))).draw()
+        Solver.solve(load_from_file(path('problem-memory.txt'))).draw()

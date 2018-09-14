@@ -1,8 +1,10 @@
-from .exceptions import FormatError, ComputeError
-from .cell import Cell
+import copy
+import itertools
+import time
 from collections import deque
 
-import heapq, copy, time, itertools
+from .cell import Cell
+from .exceptions import ComputeError, FormatError
 
 
 class _Process():
@@ -20,48 +22,6 @@ class _Process():
         self.table = table
 
 class Solver():
-
-    @staticmethod
-    def load(txt):
-        """Create a list structure from a special form of string.
-
-        Args:
-            txt: a form of string, 9 lines, x represents blank cell that needs to fill. An example here:
-                xx31x8xxx
-                xx2xxx7xx
-                8xx63xxxx
-                xx4x568xx
-                xxx2x9xxx
-                xx538x2xx
-                xxxx91xx3
-                xx9xxx4xx
-                xxx8x79xx
-        
-        Returns:
-            A 2d list object with None values.
-        """
-        if txt is None or txt == '':
-            raise FormatError('Nothing passed in')
-        if not isinstance(txt, str):
-            raise FormatError('Expect a string value')
-        table = list(filter(lambda x: False if x == '' else True, txt.splitlines()))
-        if len(table) != 9:
-            raise FormatError('Row number is {} which is not equal to 9'.format(len(table)))
-        for i,row in enumerate(table):
-            try:
-                table[i] = list(map(lambda x: None if x == 0 else x,
-                    map(int, row.strip().replace(' ', '').replace('x', '0'))))
-                if len(table[i]) < 9:
-                    raise FormatError('Col-{} has cells less than 9'.format(i+1))
-                elif len(table[i]) > 9:
-                    raise FormatError('Col-{} has cells more than 9'.format(i+1))
-            except ValueError as e:
-                msg = e.args[0]
-                idx_start = msg.index('\'')
-                idx_end = msg.rindex('\'')
-                raise FormatError('Row-{} has an error when parsing, {} is not an number'.format(i+1,
-                    msg[idx_start:idx_end+1]))
-        return table
 
     @staticmethod
     def validate(table):
@@ -150,7 +110,7 @@ class Solver():
         return ((i,y) for i in range(9) if not i == x)
 
     def walk_box(self, x, y):
-        kx, ky = (x-x%3, y-y%3)
+        kx, ky = (x-x%3, y-y%3) # get first cell's coordinate of box in which x,y is located 
         return ((i, j) for i in range(kx, kx+3) for j in range(ky, ky+3) if i != x and j != y)
 
     def related_cells(self, x, y):
@@ -159,8 +119,7 @@ class Solver():
             yield i
 
     def all_affected_cells(self, x, y):
-        for p in self.related_cells(x, y):
-            i, j = p
+        for (i, j) in self.related_cells(x, y):
             if isinstance(self.table[i][j], Cell):
                 yield self.table[i][j]
 
@@ -183,7 +142,7 @@ class Solver():
 
     def push_affected_cells(self, x, y):
         for p in self.uncertain:
-            self.que.append(p)
+            self.dirty.append(p)
             
     def is_end(self):
         return True if len(self.uncertain) == 0 else False
@@ -191,17 +150,16 @@ class Solver():
     def __init__(self, table):
         self.table = table
         self.uncertain = set()
-        self.que = set()
 
         for x in range(len(self.table)):
             for y in range(len(self.table[x])):
                 self.table[x][y] = self.compute_possible_values(x, y)
                 if isinstance(self.table[x][y], Cell):
                     self.uncertain.add((x,y))
-        self.que = deque(self.uncertain)
+        self.dirty = deque(self.uncertain)
 
-        while len(self.que) > 0:
-            x, y = pos = self.que.popleft()
+        while len(self.dirty) > 0:
+            x, y = pos = self.dirty.popleft()
             cell = self.table[x][y]
             if pos in self.uncertain:
                 if len(cell) == 1:

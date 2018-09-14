@@ -1,5 +1,9 @@
-from .solver import Solver
-import os, sys, argparse
+import argparse
+import os
+import sys
+
+from . import Solver, load_from_file, load_from_input
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -10,14 +14,12 @@ def main():
     # parser.add_argument('-v', '--verbose', action='store_true', help='Give some detail infomation')
     args = parser.parse_args()
     if args.file:
-        with open(os.path.join(os.getcwd(), args.file), 'r') as f:
-            problem = f.read()
+        problem = load_from_file(args.file)
     else:
         print('Please type the problem in:')
-        # insert a white line means input is over
-        problem = ''.join(line for line in iter(sys.stdin.readline, '\n'))
+        problem = load_from_input()
 
-    process = Solver.solve(Solver.load(problem))
+    process = Solver.solve(problem)
     process.draw()
     if args.time:
         print('Cost: {}s'.format(process['cost']))
