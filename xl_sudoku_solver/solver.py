@@ -4,22 +4,8 @@ import time
 from collections import deque
 
 from .cell import Cell
-from .exceptions import ComputeError, FormatError
+from .exceptions import ComputeError, FormatError, GameError
 
-
-class _Process():
-    """A container of solver's table during futher exploration.
-
-    Attributes:
-        table: a copy of solver's table.
-    """
-
-    @classmethod
-    def from_solver(cls, solver):
-        return cls(copy.deepcopy(solver.table))
-
-    def __init__(self, table):
-        self.table = table
 
 class Solver():
 
@@ -52,41 +38,33 @@ class Solver():
     def solve(cls, table):
         """Algorithm goes here, pass a 2d list in and get a filled back.
         """
-        info = {} # TODO stores some verbose
-        exploration = [] # A stack, used to store uncertained tables, wrapped by Process
-
-        def add2exploration(svl):
-            x, y = min(svl.uncertain, key=lambda p: svl.table[p[0]][p[1]])
-            for k in svl.table[x][y].all_possibility():
-                process = _Process.from_solver(svl)
-                process.table[x][y] = k
-                exploration.append(process)
 
         start_time = time.clock()
+        result = cls._scan(table, 0)
+        result.info['cost'] = time.clock() - start_time
+        if not result:
+            raise GameError('Scan over the whole world, but couldn\'t find any result:(')
+        return result
 
+    @classmethod
+    def _scan(cls, table, deep):
         svl = cls(table)
-        if not svl.is_end():
-            add2exploration(svl)
-
-        while not len(exploration) == 0:
-            explore = exploration.pop()
+        if svl.is_end():
+            if svl.is_confirm():
+                svl.info['deep'] = deep
+                return svl
+            return None
+        x, y = min(svl.uncertain, key=lambda p: svl.table[p[0]][p[1]])
+        for k in svl.table[x][y].all_possibility():
+            new_table = copy.deepcopy(svl.table)
+            new_table[x][y] = k
             try:
-                svl = cls(explore.table)
-                if not svl.is_end():
-                    add2exploration(svl)
-                elif not svl.is_confirm():
+                svl2 = cls._scan(new_table, deep+1)
+                if not svl2:
                     continue
-                else:
-                    break
+                return svl2
             except ComputeError:
                 pass
-
-        info['cost'] = time.clock() - start_time
-
-        if not svl.is_confirm():
-            raise FormatError('Search for no result')
-        svl.info = info
-        return svl
 
     def __repr__(self):
         line = '+-----------+-----------+-----------+\n'
@@ -101,7 +79,9 @@ class Solver():
         print(repr(self), end='')
 
     def is_confirm(self):
-        return Solver.validate(self.table)
+        if not self.completed:
+            self.completed = Solver.validate(self.table)
+        return self.completed
 
     def walk_row(self, x, y):
         return ((x,i) for i in range(9) if not i == y)
@@ -131,8 +111,7 @@ class Solver():
             self.table[x][y].set_pos(x, y)
         cell = self.table[x][y]
         
-        for idx in self.related_cells(x, y):
-            i, j = idx
+        for (i, j) in self.related_cells(x, y):
             if isinstance(self.table[i][j], int):
                 cell.minus(self.table[i][j])
 
@@ -149,7 +128,9 @@ class Solver():
 
     def __init__(self, table):
         self.table = table
+        self.info = {'deep':-1}
         self.uncertain = set()
+        self.completed = False
 
         for x in range(len(self.table)):
             for y in range(len(self.table[x])):

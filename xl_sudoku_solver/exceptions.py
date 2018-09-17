@@ -6,3 +6,6 @@ class InternalError(Exception):
 
 class ComputeError(Exception):
     pass
+
+class GameError(Exception):
+    pass

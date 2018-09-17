@@ -9,8 +9,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--file',
         help='The file in which a string format of a Soduku problem is contained')
-    details = parser.add_mutually_exclusive_group()
+    details = parser.add_argument_group()
     details.add_argument('-t', '--time', action='store_true', help='Print cost time')
+    details.add_argument('-d', '--deep', action='store_true', help='Print guess times')
     # parser.add_argument('-v', '--verbose', action='store_true', help='Give some detail infomation')
     args = parser.parse_args()
     if args.file:
@@ -22,7 +23,9 @@ def main():
     process = Solver.solve(problem)
     process.draw()
     if args.time:
-        print('Cost: {}s'.format(process['cost']))
+        print('Cost: {:.3f}s'.format(process['cost']))
+    if args.deep:
+        print('Deep: {}'.format(process['deep']))
         
     return 0
 

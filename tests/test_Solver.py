@@ -1,7 +1,6 @@
 import os
 import unittest
 
-from xl_sudoku_solver.exceptions import *
 from xl_sudoku_solver import Solver, load_from_file
 
 
@@ -67,3 +66,6 @@ class TestSolver(unittest.TestCase):
         Solver.solve(load_from_file(path('problem-senior-1.txt'))).draw()
         Solver.solve(load_from_file(path('problem-senior-2.txt'))).draw()
         Solver.solve(load_from_file(path('problem-memory.txt'))).draw()
+        Solver.solve(load_from_file(path('problem-extreme-1.txt'))).draw()
+        Solver.solve(load_from_file(path('problem-extreme-2.txt'))).draw()
+        Solver.solve(load_from_file(path('problem-extreme-3.txt'))).draw()

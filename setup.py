@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="xl-sudoku-solver",
-    version="0.0.1.post2",
+    version="0.0.1.post3",
     packages=['xl_sudoku_solver'],
     entry_points={
         "console_scripts": [
