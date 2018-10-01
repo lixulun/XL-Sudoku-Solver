@@ -4,8 +4,8 @@ import sys
 from .exceptions import FormatError
 
 
-def from_string(txt):
-    """Create a list structure from a special format of string.
+def from_text(txt):
+    """Create a list structure from a special format of text.
 
     Args:
         txt: a string, 9 lines, 'x' represents blank cell that needs to fill. An example here:
@@ -45,6 +45,25 @@ def from_string(txt):
                 msg[idx_start:idx_end+1]))
     return table
 
+def from_string(string):
+    """Create a list structure from a string.
+
+    Args:
+        string: consist of 81 numbers. An example:
+            020000080568179234090000010030040050040205090070080040050000060289634175010000020
+    
+    Returns:
+        A 2d list object.
+    """
+    if len(string) != 81:
+        raise FormatError('string does not have precise 81 numbers')
+    text_format = []
+    for i, c in enumerate(string, 1):
+        text_format.append(c)
+        if i%9 == 0:
+            text_format.append('\n')
+    return from_text(''.join(text_format))
+
 def from_file(filename):
     """Create a list structure from a special format of file.
 
@@ -55,7 +74,7 @@ def from_file(filename):
         A 2d list object.
     """
     with open(filename, 'r') as f:
-        return from_string(f.read())
+        return from_text(f.read())
 
 def from_input():
     """Create a list structure from input.
@@ -64,4 +83,4 @@ def from_input():
         A 2d list object.
     """
     # insert a white line means input is over
-    return from_string(''.join(line for line in iter(sys.stdin.readline, '\n')))
+    return from_text(''.join(line for line in iter(sys.stdin.readline, '\n')))

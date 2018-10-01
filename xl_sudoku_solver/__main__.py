@@ -2,19 +2,22 @@ import argparse
 import os
 import sys
 
-from . import Solver, load_from_file, load_from_input
+from . import Solver, load_from_file, load_from_input, load_from_string
 
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('string', nargs='?', default=None, help="81 numbers as input")
     parser.add_argument('-f', '--file',
-        help='The file in which a string format of a Soduku problem is contained')
+        help='load game from a file')
     details = parser.add_argument_group()
-    details.add_argument('-t', '--time', action='store_true', help='Print cost time')
-    details.add_argument('-d', '--deep', action='store_true', help='Print guess times')
+    details.add_argument('-t', '--time', action='store_true', help='print cost time')
+    details.add_argument('-d', '--deep', action='store_true', help='print guess times')
     # parser.add_argument('-v', '--verbose', action='store_true', help='Give some detail infomation')
     args = parser.parse_args()
-    if args.file:
+    if args.string:
+        problem = load_from_string(args.string)
+    elif args.file:
         problem = load_from_file(args.file)
     else:
         print('Please type the problem in:')
