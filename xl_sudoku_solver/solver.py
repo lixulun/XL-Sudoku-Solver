@@ -102,7 +102,7 @@ class Solver():
                 process.table[x][y] = k
                 exploration.append(process)
 
-        start_time = time.clock()
+        start_time = time.time()
 
         svl = cls(table)
         if not svl.is_end():
@@ -122,7 +122,7 @@ class Solver():
             except ComputeError:
                 pass
 
-        info['cost'] = time.clock() - start_time
+        info['cost'] = time.time() - start_time
 
         if not svl.is_confirm():
             raise FormatError('Search for no result')
