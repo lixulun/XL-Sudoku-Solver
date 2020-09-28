@@ -1,4 +1,4 @@
-# XL-Sudoku-Solver
+# Sudokuless
 
 ## Install
 ```
