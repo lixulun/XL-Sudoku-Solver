@@ -1,0 +1,38 @@
+<project name="sudokuless" default="install" basedir=".">
+
+    <target name="install">
+        <exec executable="python">
+            <arg value="setup.py"/>
+            <arg value="install"/>
+        </exec>
+    </target>
+
+    <target name="dev">
+        <exec executable="python">
+            <arg value="setup.py"/>
+            <arg value="develop"/>
+        </exec>
+    </target>
+
+    <target name="remove">
+        <exec executable="pip">
+            <arg value="uninstall"/>
+            <arg value="sudokuless"/>
+            <arg value="-y"/>
+        </exec>
+    </target>
+
+    <target name="test">
+        <exec executable="python">
+            <arg value="setup.py"/>
+            <arg value="test"/>
+        </exec>
+    </target>
+
+    <target name="clean">
+        <exec executable="python">
+            <arg value="setup.py"/>
+            <arg value="clean"/>
+        </exec>
+    </target>
+</project>
